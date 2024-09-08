@@ -74,9 +74,6 @@ plt.legend()
 plt.grid(True)
 
 # Añadir el porcentaje de cambio en el MSE al gráfico
-# Ajustar la posición (x, y) según sea necesario
-print("DataC=>" + str(df['Precio U$D'].min()))
-
 plt.text(100, y=df['Precio U$D'].min(), 
          s=f'Porcentaje de Cambio en el MSE: {porcentaje_cambio_mse:.2f}%',
          fontsize=12, color='black', va='bottom', ha='left')
