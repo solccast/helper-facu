@@ -1,14 +1,3 @@
-"""
-3) La empresa META quiere pronosticar el precio de sus acciones en función de los dias en el periodo del
-03/09/23 al 30/08/24, pero durante las fechas del 02/02/24 al 24/04/24 implementaron una serie de
-actualizaciones en sus distintas plataformas que dispararon el precio de sus acciones y querían saber en que
-porcentaje afectaron dichas actualizaciones al ajuste y a la linealidad.
-Utilizando los datos proporcionados en el archivo “META” haga los cálculos necesarios y responda
-Sugerencia: Realice dos analisis diferentes y para una de ellas desestimar los datos del periodo de
-actualización.
-Código by Chatgpt:
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,6 +37,10 @@ modelo_sin_actualizaciones.fit(X_sin_actualizaciones, y_sin_actualizaciones)
 predicciones_sin_actualizaciones = modelo_sin_actualizaciones.predict(X_sin_actualizaciones)
 mse_sin_actualizaciones = mean_squared_error(y_sin_actualizaciones, predicciones_sin_actualizaciones)
 
+# Cálculo del impacto de las actualizaciones en el ajuste
+diferencia_mse = mse_general - mse_sin_actualizaciones
+porcentaje_cambio_mse = (diferencia_mse / mse_general) * 100
+
 # Resultados
 print("Modelo General:")
 print(f"Pendiente: {modelo_general.coef_[0]}")
@@ -58,6 +51,8 @@ print("\nModelo Sin Datos Durante Actualizaciones:")
 print(f"Pendiente: {modelo_sin_actualizaciones.coef_[0]}")
 print(f"Intercepto: {modelo_sin_actualizaciones.intercept_}")
 print(f"MSE (Error Cuadrático Medio): {mse_sin_actualizaciones}")
+
+print(f"\nPorcentaje de Cambio en el MSE debido a las actualizaciones: {porcentaje_cambio_mse:.2f}%")
 
 # Graficar
 plt.figure(figsize=(12, 6))
@@ -77,5 +72,13 @@ plt.xlabel('Días')
 plt.ylabel('Precio')
 plt.legend()
 plt.grid(True)
+
+# Añadir el porcentaje de cambio en el MSE al gráfico
+# Ajustar la posición (x, y) según sea necesario
+print("DataC=>" + str(df['Precio U$D'].min()))
+
+plt.text(100, y=df['Precio U$D'].min(), 
+         s=f'Porcentaje de Cambio en el MSE: {porcentaje_cambio_mse:.2f}%',
+         fontsize=12, color='black', va='bottom', ha='left')
 
 plt.show()
