@@ -16,7 +16,7 @@ poetry add flask-sqlalchemy@latest
 En `core` configuramos la base de datos.
 ```python
 #database.py
-import flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
@@ -48,7 +48,7 @@ def reset():
     print("Eliminando base de datos...")
     db.drop_all()
     print("Creando base nuevamente...")
-    db.create_app()
+    db.create_all()
     print("Hecho")
 
 
