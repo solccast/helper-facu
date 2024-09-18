@@ -1,7 +1,7 @@
 # Practica 3 - DNS
 
 ## Introducción
-
+Todos los mensajes de consulta y de respuesta DNS se envían dentro de datagramas UDP al puerto 53.
 ### 1. Investigue y describa cómo funciona el DNS. ¿Cuál es su objetivo? 
 El objetivo principal es el de traducir nombres de dominio a direcciones IP para lograr una abstracción de las direcciones de red utilizadas internamente por los protocolos. Permite así ubicar a un dispositivo por su nombre sin importar cuál es su dirección IP actual. 
 Funciona como un sistema distribuido de forma jerárquica, a través de dominios, sub-dominios y nombres finales, con un conjunto de servidores a lo largo del mundo.  
@@ -86,27 +86,72 @@ Además de los registros NS, se deben agregar registros **A** (o *AAAA*) para lo
 ![alt text](image-16.png)
 
 i. ¿La solicitud fue recursiva? ¿Y la respuesta? ¿Cómo lo sabe?
-_falta completar_ Por flag rd y ra 
+_falta completar_ 
+Por el **flag rd** (recursión deseada) en la cabecera del mensaje indica que se solicitó una consulta recursiva.
+El **flag ra** (recursión disponible) indica que el servidor que atendió la consulta admite consultas recursivas. 
 
-ii. ¿Puede indicar si se trata de una respuesta autoritativa? ¿Qué significa que lo sea? 
-Por el flag `aa` podemos determinar que sí fue una respuesta autoritativa. 
+ii. ¿Puede indicar si se trata de una respuesta autoritativa? ¿Qué significa que lo sea?
+Por el flag `aa` podemos determinar que sí fue una respuesta autoritativa. Esto significa que el servidor tiene registros originales o una copia autorizada de la información de ese dominio, y no está devolviendo una respuesta obtenida de otro servidor de manera recursiva. 
 
 iii. ¿Cuál es la dirección IP del resolver utilizado? ¿Cómo lo sabe?
-
+La dirección IP del resolver se muestra en la sescción **SERVER: 172.28.0.29**
 
 b. ¿Cuáles son los servidores de correo del dominio redes.unlp.edu.ar? ¿Por qué hay más de uno y qué significan los números que aparecen entre MX y el nombre? Si se quiere enviar un correo destinado a redes.unlp.edu.ar, ¿a qué servidor se le entregará? ¿En qué situación se le entregará al otro? 
+![alt text](image-18.png)
+Los servidores de correo del dominio redes.unlp.edu.ar son 
+```
+mail2.redes.unlp.edu.ar
+mail.redes.unlp.edu.ar
+```
+Hay más de uno para la redundancia y balanceo de carga. Si uno de los servidos no está disponible, el correo se puede dirigir a otro servidor alternativo. 
+Los números entre MX y el nombre son las prioridades. Un número más bajo indica una mayor prioridad (donde se intentará entregar el correo en primer lugar), en caso de que este servidor no esté disponible o no responda, el sistema intentará entregar el correo al siguiente servidor en la lista. 
+
 c. ¿Cuáles son los servidores de DNS del dominio redes.unlp.edu.ar? 
-d. Repita la consulta anterior cuatro veces más. ¿Qué observa? ¿Puede explicar a qué se debe? 
+![alt text](image-19.png)
+Comando `dig redes.unlp.edu.ar NS` 
+Obtenemos que los servidores son `ns-sv-a.redes.info.unlp.edu.ar` y `ns-sv-b.redes.info.unlp.edu.ar`. Éstos son los que tienen autoridad para responder a las consultas DNS sobre los subdominios o recursos dentro del dominio. 
+
+d. Repita la consulta anterior cuatro veces más. ¿Qué observa? ¿Puede explicar a qué se debe? CONSULTAR!!!
+Cambia 
+- Cookie obtenida en cada consulta
+- Query time y WHEN (obviosly xd)
+- ID de consulta 
+
 e. Observe la información que obtuvo al consultar por los servidores de DNS del dominio. En base a la salida, ¿es posible indicar cuál de ellos es el primario? 
+El registro NS no proporciona esa información. Es necesario acceder a otro registro que específique el primario. Es necesario consultar el **registro SOA** 
+
 f. Consulte por el registro SOA del dominio y responda.
-    i. ¿Puede ahora determinar cuál es el servidor de DNS primario? 
-    ii. ¿Cuál es el número de serie, qué convención sigue y en qué casos es importante actualizarlo? 
-    iii. ¿Qué valor tiene el segundo campo del registro? Investigue para qué se usa y cómo se interpreta el valor. 
-    iv.¿Qué valor tiene el TTL de caché negativa y qué significa?
+![alt text](image-20.png)
+_Comando `dig redes.info.unlp.edu.ar -t SOA`_
+
+i. ¿Puede ahora determinar cuál es el servidor de DNS primario? 
+El servidor primario es `ns-sv-a.redes.info.unlp.edu.ar` 
+
+ii. ¿Cuál es el número de serie, qué convención sigue y en qué casos es importante actualizarlo? 
+El número de serie es el primer parámetro que se muestra (`2020031700`). éste indica la versión actual de los datos de la zona. Cada vez que se realiza un cambio en la zona DNS, el número de serie debe incrementarse para que los servidores secundarios sepan que hay una nueva versión de la zona y deben actualizarla. 
+Sigue la convención del formato de fecha `YYYYMMDDXX` donde XX es un contador de cambios en el mismo día. 
+
+iii. ¿Qué valor tiene el segundo campo del registro? Investigue para qué se usa y cómo se interpreta el valor. 
+El segundo campo es el campo **Refresh** especifica el intervalo de tiempo que los servidores DNS secundarios esperan antes de volver a preguntar al servidor primario si la zona ha sido actualizada. Si el tiempo pasó y el número de serie cambió, los servidores secundarios obtendran una copia nueva de la zona.  
+
+iv.¿Qué valor tiene el TTL de caché negativa y qué significa?
+TTL es el tiempo de vida del registro de recurso; determina cuándo un recurso debería ser eliminado de una caché.
+Tiene el valor TTL = 86400 (24hr) lo que significa que si una consulta a un dominio que no existe es realizada, los servidores que cacheen esta respuesta almacenarán la información de que **no existe** durante 24 hrs antes de volver a cosultar con los servidores autoritativos. En ese tiempo, todas las consultas para ese dominio recibirán la misma respuesta negativa directamente desde la caché. 
+
 g. Indique qué valor tiene el registro TXT para el nombre saludo.redes.unlp.edu.ar. Investigue para qué es usado este registro. 
+![alt text](image-21.png)
+
 h. Utilizando dig, solicite la transferencia de zona de redes.unlp.edu.ar, analice la salida y responda.
-    i. ¿Qué significan los números que aparecen antes de la palabra IN? ¿Cuál es su finalidad?
-    ii. ¿Cuántos registros NS observa? Compare la respuesta con los servidores de DNS del dominio redes.unlp.edu.ar que dio anteriormente. ¿Puede explicar a qué se debe la diferencia y qué significa?
+![alt text](image-22.png)
+i. ¿Qué significan los números que aparecen antes de la palabra IN? ¿Cuál es su finalidad?
+Los números que aparecen corresponden al TTL en segundos. Indica cuánto tiempo los servidores DNS cacherarán un registro antes de solicitar una actualización. 
+300 -> 5 minutos
+604800 -> 7 días 
+86400 -> 24 hrs
+
+ii. ¿Cuántos registros NS observa? Compare la respuesta con los servidores de DNS del dominio redes.unlp.edu.ar que dio anteriormente. ¿Puede explicar a qué se debe la diferencia y qué significa?
+Se pueden observar cuatro registros NS ... 
+
 i. Consulte por el registro A de www.redes.unlp.edu.ar y luego por el registro A de www.practica.redes.unlp.edu.ar. Observe los TTL de ambos. Repita la operación y compare el valor de los TTL de cada uno respecto de la respuesta anterior. ¿Puede explicar qué está ocurriendo? (Pista: observar los flags será de ayuda). 
 j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo alguna respuesta? Investigue sobre los códigos de respuesta de DNS. ¿Para qué son utilizados los mensajes NXDOMAIN y NOERROR?
 
@@ -116,6 +161,10 @@ j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo algun
 - Dirección IP de www.redes.unlp.edu.ar. 
 - Servidores de correo del dominio redes.unlp.edu.ar.
 - Servidores de DNS del dominio redes.unlp.edu.ar.
+
+`nslookup` _(Name Server Lookup)_ permite obtener información sobre la dirección IP ascoaida a un nombre de dominio y viceversa. 
+`host` proporciona información sobre nombres de dominio y direcciones IP.  
+
 ### 13. ¿Qué función cumple en Linux/Unix el archivo `/etc/hosts` o en Windows el archivo `\WINDOWS\system32\drivers\etc\hosts`?
 Se utiliza para la resolución de nombres de dominio. Su función principal es mapear nombres de host a direcciones IP sin necesidad de consultar un servidor DNS. 
 En ese archivo puede definir manualmente direcciones IP y asociarlas con nombres de dominio específicos. 
@@ -147,3 +196,10 @@ b. ¿Dónde es recursiva la consulta? ¿Y dónde iterativa?
 ---
 ## De interés
 Explica sobre flags en dig: https://blog.standalonecomplex.es/2010/05/16/guia-de-dig/ 
+
+Explicación sobre el comando dig: https://www.hostinger.com.ar/tutoriales/comando-dig-linux
+
+--
+
+## Consultar 
+Ejercicio 11 punto d. 
