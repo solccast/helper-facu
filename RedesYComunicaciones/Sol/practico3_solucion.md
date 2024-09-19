@@ -20,9 +20,9 @@ En una consulta DNS las respuestas autoritativas son marcadas como tales por el 
 
 ### 5. ¿Qué es el resolver? CONSULTAR
 El **Resolver** actúa como un intermediario entre un cliente y los servidores DNS. 
-El **stub resolver** envía una consulta DNS al servidor DNS recursivo y espera una respuesta final. No resuelve directamente el nombre de dominio, solo hace una petición a otro servidor queh ará el trabajo por él. 
-El **recursive resolver** recibe la consulta del stub resolver y se encarga de realizar todo el proceso de resolución que puede incluir consultas amúltiples servidores DNS hasta obtener la dirección IP final. Este tipo de resolver hace consultas recursivas en nombre del cliente y devuelve una respuesta completa. El resolver revisa su caché local para ver si ya tiene la respuesta a la consulta. Si tiene la respuesta, la devuelve al cliente sin necesidad de nuevas consultas. Caso contrario, envía una consulta al servidor raíz, que le dirá a qué servidor TLD acudir. 
 
+La máquina le pide al resolver y el resolver al servidor DNS. 
+El resolver es el que se encarga de comunicarse con el servidor local para obtener la información. 
 ### 6. Describa para qué se utilizan los siguientes tipos de registros de DNS: 
 a. A    f. NS 
 b. MX   g. CNAME
@@ -77,7 +77,7 @@ Permite que los servidores secundarios reciban actualizaciones de manera oportun
 
 ### 10. Imagine que usted es el administrador del dominio de DNS de la UNLP (unlp.edu.ar). A su vez, cada facultad de la UNLP cuenta con un administrador que gestiona su propio dominio (por ejemplo, en el caso de la Facultad de Informática se trata de info.unlp.edu.ar). Suponga que se crea una nueva facultad, Facultad de Redes, cuyo dominio será redes.unlp.edu.ar, y el administrador le indica que quiere poder manejar su propio dominio. ¿Qué debe hacer usted para que el administrador de la Facultad de Redes pueda gestionar el dominio de forma independiente? (Pista: investigue en qué consiste la delegación de dominios). Indicar qué registros de DNS se deberían agregar.
 
-Debería delegar la autoridad para el subdominio. Esto se realiza mendiante registros de tipo **NS (Name Server)** en el servidor DNS del dominio superior, en este caso `unlp.edu.ar` debe añadir registros NS para el nuevo subdominio `redes.unlp.edu.ar` que apunten a los servidores DNS responsables del subdominio. 
+Debería delegar la autoridad para el subdominio. Esto se realiza mediante registros de tipo **NS (Name Server)** en el servidor DNS del dominio superior, en este caso `unlp.edu.ar` debe añadir registros NS para el nuevo subdominio `redes.unlp.edu.ar` que apunten a los servidores DNS responsables del subdominio. 
 Además de los registros NS, se deben agregar registros **A** (o *AAAA*) para los nombres de los servidores DNS para proporcionar las direcciones IP de los servidores DNS delegados.
 
 ### 11. Responda y justifique los siguientes ejercicios. 
@@ -114,7 +114,7 @@ Obtenemos que los servidores son `ns-sv-a.redes.info.unlp.edu.ar` y `ns-sv-b.red
 d. Repita la consulta anterior cuatro veces más. ¿Qué observa? ¿Puede explicar a qué se debe? CONSULTAR!!!
 Cambia 
 - Cookie obtenida en cada consulta
-- Query time y WHEN (obviosly xd)
+- Query time y WHEN
 - ID de consulta 
 
 e. Observe la información que obtuvo al consultar por los servidores de DNS del dominio. En base a la salida, ¿es posible indicar cuál de ellos es el primario? 
@@ -192,7 +192,8 @@ En ese archivo puede definir manualmente direcciones IP y asociarlas con nombres
 de esta forma cualquier solicitud a `miapp.local` se resolverá a la dirección IP `127.0.0.1`  
 
 ### 14. Abra el programa Wireshark para comenzar a capturar el tráfico de red en la interfaz con IP 172.28.0.1. Una vez abierto realice una consulta DNS con el comando dig para averiguar el registro MX de redes.unlp.edu.ar y luego, otra para averiguar los registros NS correspondientes al dominio redes.unlp.edu.ar. Analice la información proporcionada por dig y compárelo con la captura.
-### 15. . Dada la siguiente situación: “Una PC en una red determinada, con acceso a Internet, utiliza los servicios de DNS de un servidor de la red”. Analice:
+
+### 15. Dada la siguiente situación: “Una PC en una red determinada, con acceso a Internet, utiliza los servicios de DNS de un servidor de la red”. Analice:
 ```
 a. ¿Qué tipo de consultas (iterativas o recursivas) realiza la PC a su servidor de DNS? 
 b. ¿Qué tipo de consultas (iterativas o recursivas) realiza el servidor de DNS para resolver requerimientos de usuario como el anterior? ¿A quién le realiza estas consultas?
@@ -220,3 +221,4 @@ Explicación sobre el comando dig: https://www.hostinger.com.ar/tutoriales/coman
 
 ## Consultar 
 Ejercicio 11 punto d. 
+dig www.google.com @unlp.unlp.edu.ar  //Probar fuera de la facultad 
