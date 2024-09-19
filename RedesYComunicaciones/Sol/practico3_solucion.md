@@ -153,8 +153,25 @@ ii. ¿Cuántos registros NS observa? Compare la respuesta con los servidores de 
 Se pueden observar cuatro registros NS ... 
 
 i. Consulte por el registro A de www.redes.unlp.edu.ar y luego por el registro A de www.practica.redes.unlp.edu.ar. Observe los TTL de ambos. Repita la operación y compare el valor de los TTL de cada uno respecto de la respuesta anterior. ¿Puede explicar qué está ocurriendo? (Pista: observar los flags será de ayuda). 
-j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo alguna respuesta? Investigue sobre los códigos de respuesta de DNS. ¿Para qué son utilizados los mensajes NXDOMAIN y NOERROR?
+![alt text](image-23.png)
+_Segunda consulta TTL a redes.unlp.edu.ar_
+Se puede observar el flag _AA_ que indica que la respuesta fue provista por un servidor autoritativo, entonces el TTL es mayor ya que sería una respuesta "fresca" 
 
+![alt text](image-24.png)
+_Segunda consulta TTL a practica.redes.unlp.edu.ar_
+
+En el segundo caso no aparece el flag AA (Authoritative Answer), lo que significa que la respuesta no proviene de un servidor autoritativo. Sugiere que la respuesta proviene de un caché de DNS.
+El valor del TTL disminuye en cada consulta.
+
+j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo alguna respuesta? Investigue sobre los códigos de respues
+ta de DNS. ¿Para qué son utilizados los mensajes NXDOMAIN y NOERROR?
+
+![alt text](image-25.png)
+El protocolo DNS utiliza códigos de respuesta (conocidos como Rcodes) para indicar el resultado de la consulta. Algunos de los códigos más comunes son:
+
+- **NOERROR (Código 0)**: la consulta se resolvió correctamente y se proporcionó una respuesta, aunque puede que no contenga registros.
+
+- **NXDOMAIN (Código 3)**: se utiliza cuando el nombre de dominio no existe en el DNS, que no tiene regustro.
 
 
 ### 12. Investigue los comandos nslookup y host. ¿Para qué sirven? Intente con ambos comandos obtener:
@@ -162,7 +179,7 @@ j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo algun
 - Servidores de correo del dominio redes.unlp.edu.ar.
 - Servidores de DNS del dominio redes.unlp.edu.ar.
 
-`nslookup` _(Name Server Lookup)_ permite obtener información sobre la dirección IP ascoaida a un nombre de dominio y viceversa. 
+`nslookup` _(Name Server Lookup)_ permite obtener información sobre la dirección IP asociada a un nombre de dominio y viceversa. 
 `host` proporciona información sobre nombres de dominio y direcciones IP.  
 
 ### 13. ¿Qué función cumple en Linux/Unix el archivo `/etc/hosts` o en Windows el archivo `\WINDOWS\system32\drivers\etc\hosts`?
