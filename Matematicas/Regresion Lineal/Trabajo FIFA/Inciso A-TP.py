@@ -123,10 +123,10 @@ def get_estimated_proportion(df, x_avg, sxx, estimated_variance):
     total_count = len(df['value_eur'])
     
     proportion = exceed_count / total_count
-    proportion_scaled = proportion * math.sqrt(total_count - 1)
+    proportion_scaled = proportion * math.sqrt(total_count - 2)
 
     print(f"Proporción de veces que el valor de mercado supera la incertidumbre de predicción: {proportion:.4f}")
-    print(f"Proporción escalada por sqrt(n-1): {proportion_scaled:.4f}")
+    print(f"Proporción escalada por sqrt(n-2): {proportion_scaled:.4f}")
 
 # Función para calcular el coeficiente de determinación R²
 def calcular_r_cuadrado(dependiente, independiente):
@@ -156,7 +156,7 @@ def calcular_r_cuadrado(dependiente, independiente):
 def get_five_best():
     """
     Obtiene las 5 características más correlacionadas con el valor de mercado
-    y calcula la regresión lineal para cada una.(Intervalos de Confianza únicamente hechos para overall, aunque borrando el if se obtienen el resto con los niveles dados)
+    y calcula la regresión lineal para cada una.(Intervalos de Confianza únicamente hechos para overall, aunque borrando el if se obtienen el resto con los niveles dados.)
     Datos utilizados:
     - Característica objetivo: 'value_eur' (valor de mercado de un jugador)
     - Variables independientes: 5 características del jugador con mayor correlación con 'value_eur'
@@ -193,6 +193,8 @@ def get_five_best():
 
             # Proporción de veces que el valor de mercado supera la incertidumbre de predicción
             get_estimated_proportion(df, np.mean(df[atributo]), sxx, estimated_variance)
+            
+            x = estimated_variance * ( (1/len(df[columna_referencia]))+ (((np.mean(df[atributo])**2)/sxx)) )
 # Ejecución del análisis
 if __name__ == "__main__":
     get_five_best()
