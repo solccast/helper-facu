@@ -164,7 +164,7 @@ En el segundo caso no aparece el flag AA (Authoritative Answer), lo que signific
 El valor del TTL disminuye en cada consulta.
 
 j. Consulte por el registro A de www.practica2.redes.unlp.edu.ar. ¿Obtuvo alguna respuesta? Investigue sobre los códigos de respues
-ta de DNS. ¿Para qué son utilizados los mensajes NXDOMAIN y NOERROR?
+ta de DNS. ¿Para qué son utilizados los mensajes NXDOMAIN y NOERROR? CONSULTAR
 
 ![alt text](image-25.png)
 El protocolo DNS utiliza códigos de respuesta (conocidos como Rcodes) para indicar el resultado de la consulta. Algunos de los códigos más comunes son:
@@ -222,3 +222,13 @@ Explicación sobre el comando dig: https://www.hostinger.com.ar/tutoriales/coman
 ## Consultar 
 Ejercicio 11 punto d. 
 dig www.google.com @unlp.unlp.edu.ar  //Probar fuera de la facultad 
+
+---
+Siempre que haya una consulta a un nombre -> consulta DNS que pide la IP 
+Siempre que haya una consulta a una ip -> http 
+
+---
+En caso de que se haga una consulta con el flag RA activo y es autoritativo en el dominio responde igual. No niega respuesta. 
+
+---
+El resolver es una librería que utiliza el sistema operativo ofrece para poder realizar las consultas DNS y devolver los resultados. 

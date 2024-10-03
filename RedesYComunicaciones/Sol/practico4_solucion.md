@@ -1,7 +1,24 @@
 # Práctica 4: Correo electrónico
 
 ## 1. ¿Qué protocolos se utilizan para el envío de mails entre el cliente y su servidor de correo? ¿Y entre servidores de correo? 
-## 2. ¿Qué protocolos se utilizan para la recepción de mails? Enumere y explique características y diferencias entre las alternativas posibles. 
+Los protocolos que se utilizan para el envío de correos electrónicos son:
+
+1. **Entre el cliente y su servidor de correo**: Se utilizan los protocolos **POP3 (Post Office Protocol versión 3)** o **IMAP (Internet Message Access Protocol)** para la recepción de los correos, y el **SMTP (Simple Mail Transfer Protocol)** para el envío desde el cliente al servidor de correo del emisor.
+
+2. **Entre servidores de correo**: El protocolo **SMTP** es el principal protocolo utilizado para la transferencia de correos entre servidores de correo. Utiliza el servicio de transferencia de datos de TCP para transferir el correo desde el servidor de correo del emisor al servidor de correo del destinatario
+SMTP tiene dos lados: el lado del cliente, que se ejecuta en el servidor de correo del emisor, y el lado del servidor, que se ejecuta en el servidor de correo del destinatario.
+Tanto el lado del cliente como el del servidor de SMTP se ejecutan en todos los servidores de correo.
+Cuando un servidor de correo envía mensajes de correo a otros servidores de correo, actúa como un cliente SMTP. Cuando un servidor de correo recibe correo de otros servidores, actúa como un servidor SMTP.
+
+## 2. ¿Qué protocolos se utilizan para la recepción de mails? Enumere y explique características y diferencias entre las alternativas posibles.
+Los protocolos principales para la recepción de mails son:
+- POP3: permite que los correos sean descargados desde el servidor de correo al cliente (compu) eliminándolos del servidor por lo que no están disponibles para otros dispositivos. Ocupa menos espacio en el servidor.
+- IMAP: gestiona los correos directamente en el servidor sin necesidad de descargarlos, sincronizando constantemente entre el servidor y los dispositivos. El usuario puede acceder desde múltiples dispositivos. Requiere más almacenamiento en el servidor y es más dependiente de la conexión a Internet.
+
+En resumen: 
+**POP3** descarga los correos y los elimina del servidor (por defecto), mientras que **IMAP** mantiene los correos en el servidor y permite acceso desde múltiples dispositivos.
+**POP3** es más simple y eficiente en términos de almacenamiento en el servidor, mientras que **IMAP** ofrece mayor flexibilidad y sincronización de correos entre dispositivos.
+
 ## 3. Utilizando la VM y teniendo en cuenta los siguientes datos, abra el cliente de correo (Thunderbird) y configure dos cuentas de correo. Una de las cuentas utilizará POP para solicitar al servidor los mails recibidos para la misma mientras que la otra utilizará IMAP. Al crear cada una de las cuentas, seleccionar Manual config y luego de configurar las mismas según lo indicado, ignorar advertencias por uso de conexión sin cifrado.
 ```
 ● Datos para POP 
@@ -54,12 +71,13 @@ ii. Extraiga la imagen adjunta del mismo modo que lo hace el cliente de correo a
 i. ¿Qué correos ve en el buzón de entrada de ambas cuentas? ¿Están marcados como leídos o como no leídos? ¿Por qué?
 ii. ¿Qué pasó con las carpetas POP e IMAP que creó en el paso anterior?
 
-**c. Enbase a lo observado. ¿Qué protocolo le parece mejor? ¿POP o IMAP? ¿Por qué? ¿Qué protocolo considera que utiliza más recursos del servidor? ¿Por qué?**
+**c. En base a lo observado. ¿Qué protocolo le parece mejor? ¿POP o IMAP? ¿Por qué? ¿Qué protocolo considera que utiliza más recursos del servidor? ¿Por qué?**
 
 ## 7. ¿En algún caso es posible enviar más de un correo durante una misma conexión TCP? Considere:
 - Destinatarios múltiples del mismo dominio entre MUA-MSA y entre MTA-MTA
 - Destinatarios múltiples de diferentes dominios entre MUA-MSA y entre MTA-MTA
 
+En el caso en que se envie la ons
 ## 8. Indique sí es posible que el MSA escuche en un puerto TCP diferente a los convencionales y qué implicancias tendría.
 
 ## 9. Indique sí es posible que el MTA escuche en un puerto TCP diferente a los convencionales y qué implicancias tendría.
@@ -125,3 +143,13 @@ i. ¿Por qué el contenido del mail no puede ser leído en la captura de tráfic
 **g. Uncliente web que desea acceder al servidor www.example.com y que no pertenece a ninguno de estos dos dominios puede usar a ns1 de misitio.com.ar como servidor de DNS para resolver la consulta.**
 **h. Cuando Alicia quiera ver sus mails desde PC-D, ¿qué registro de DNS deberá consultarse?**
 **i. Indicar todos los protocolos de mail involucrados, puerto y si usan TCP o UDP, en el envío y recepción de dicho mail.**
+
+---
+
+La consulta al DNS por el registro A para obtener la ip correspondiente al servidor que recibirá (no por el registro MX porque así obtendrás el propio)
+- El envio es del protocolo tipo push al puerto 25 mediante SMTP.
+La conexión entre el agente de usuario y el servidor de correo es mediante POP o IMAP. 
+
+> Analizar la relación DNS con el protocolo SMTP 
+
+¿Cómo garantizo que un mail llegó de determinado dominio? Entonces, es necesario definir en el DNS un registro **SPF** del tipo txt donde se ponen las ips válidas para enviar mails de un dominio en particular, que ese DNS atiende al dominio atiende a la ip. Si el otro recibe un email de una ip que no se encuentra dentro del registro SPF entonces lo considera spam. 
