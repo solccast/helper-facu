@@ -563,6 +563,35 @@ process Autoridad{
 ## Ejercicio 3
 En una montaña hay 30 escaladores que en una parte de la subida deben utilizar un único paso de a uno a la vez y de acuerdo con el orden de llegada al mismo. Nota: sólo se pueden utilizar procesos que representen a los escaladores; cada escalador usa sólo una vez el paso. 
 
-```
+```c
+
+Monitor Montaña{
+    cond escaladores; 
+    int cant-esperando = 0;
+    bool paso_libre = true
+
+    procedure llegadaAlPaso(){
+        if not(paso_libre){
+            cant-esperando++
+            wait(escaladores)
+        }
+        
+        paso_libre=false 
+    }
+
+    procedure salidaDelPaso(){
+        cant-esperando--;
+        if(cant-esperando>0)
+            signal(escaladores) //Avisa al siguiente para que pase    
+        else paso_libre=true
+    }
+}
+
+
+process Escalador[id: 0..29]{
+    Montaña.llegadaAlPaso()
+    cruzarPaso()
+    Montaña.salidaDelPaso()
+}
 
 ```
