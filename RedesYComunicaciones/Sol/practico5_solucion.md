@@ -59,6 +59,54 @@ Ejemplo:
 - A partir de ese momento, ambos dispositivos ajustan el tamaño de los segmentos de datos que envían para que no excedan el MSS negociado por la contraparte.
 
 
+### 9. Utilice el comando ss (reemplazo de netstat) para obtener la siguiente información de su PC: 
+- a. Para listar las comunicaciones TCP establecidas. 
+```c
+ss -t -a 
+``` 
+![alt text](image-32.png)
+
+- b. Para listar las comunicaciones UDP establecidas. 
+```c
+ss -u -a
+```
+![alt text](image-33.png)
+
+- c. Obtener sólo los servicios TCP que están esperando comunicaciones
+```c
+ss -t -l 
+```
+![alt text](image-34.png)
+- d. Obtener sólo los servicios UDP que están esperando comunicaciones. 
+```c
+ss -u -l
+```
+![alt text](image-35.png)
+
+- e. Repetir los anteriores para visualizar el proceso del sistema asociado a la conexión.
+```c
+ss -t -a state established -p
+```
+![alt text](image-36.png)
+
+- f. Obtenga la misma información planteada en los items anteriores usando el comando netstat.
+
+Listar conexiones TCP establecidas: `netstat -tn`
+Listar conexiones UDP: `netstat -un`
+Servicios TCP esperando conexiones: `netstat -tl`
+Servicios UDP esperando conexiones: `netstat -ul`
+
+Conexiones TCP con procesos: `netstat -tnp`
+Conexiones UDP con procesos: `netstat -unp`
+Servicios TCP en espera con procesos: `netstat -tlp`
+Servicios UDP en espera con procesos: `netstat -ulp`
+
+- **R (Reset)**: Este flag indica que la conexión solicitada no es válida o no puede ser establecida. El host destino envía un paquete con el flag RST (Reset) para informar que la conexión no será aceptada. Esto puede suceder si no hay un servicio escuchando en el puerto especificado (en este caso, el puerto 80) o si la conexión no puede ser completada por alguna otra razón.
+
+- **A (Acknowledgment)**: El flag ACK indica que el paquete es una respuesta a un paquete previo y está reconociendo su recepción. Es decir, el host destino está indicando que ha recibido el SYN enviado previamente por hping3, pero como no quiere establecer la conexión, envía un paquete de "reset" (RST) junto con el reconocimiento (ACK).
+
+Por lo tanto, el RA en esta salida indica que el host está respondiendo a la solicitud de conexión TCP con un paquete que incluye tanto el flag RST (Reset) como el flag ACK (Acknowledgment), lo que significa que el servidor ha recibido la solicitud pero no desea continuar con la conexión.
+
 ---
 
 ## A tomar en cuenta
