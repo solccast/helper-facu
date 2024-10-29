@@ -206,12 +206,13 @@ Se debe modelar el funcionamiento de una casa de comida rápida, en la cual trab
 Se debe considerar: 
 - Cada cliente realiza un pedido y luego espera a que se lo entreguen.
 - Los pedidos que hacen los clientes son tomados por cualquiera de los vendedores y se lo pasan a los cocineros para que realicen el plato. Cuando no hay pedidos para atender, los vendedores aprovechan para reponer un pack de bebidas de la heladera. 
-- Cada cocinero toma un pedido peniente dejado por los vendedores, lo cocina y se lo entrega directamente al cliente correspondiente.
+- Cada cocinero toma un pedido pendiente dejado por los vendedores, lo cocina y se lo entrega directamente al cliente correspondiente.
 
 ```c
 chan pedidosClientes(int,texto)
 chan entregaCliente[C](comida)
-
+chan cocina(int, texto)
+chan avisoDisponible(texto)
 
 process Cliente[id: 0..C-1]{
     //Realizar pedido
@@ -222,14 +223,33 @@ process Cliente[id: 0..C-1]{
 }
 
 
+process administrador{
+    while(true){
+        receive aviso(true, idVendedor)
+        if (empty(pedidosClientes)){
+            send avisoPedido[idVendedor]("VACIO")
+        } else
+            receive pedidosClientes(idCliente, pedidoCliente)
+            send avisoPedido[idVendedor]("Pedido")
+            send pedido(idCliente, pedidoCliente)
+    }
+}
+
+
 process Vendedor[id: 0..2]{
     //Toma un pedido del canal pedidos.
     //Si es que no hay pedidos toma unos minutos.
     int idCliente;
     text pedidoCliente;
     while(true){
-
-        receive pedido(idCliente, pedidoCliente)
+        send avisoDisponible(true, id)
+        receive avisoPedido[id](msje)
+        if (msje == "VACIO"){
+            reponerBebidas(10minutos)
+        } else{
+            reseive pedido(idCliente, pedidoCliente)
+            send cocina(idCliente, pedidoCliente)
+        }
     }
 }
 
@@ -237,6 +257,11 @@ process Vendedor[id: 0..2]{
 process Cocinero[id: 0..1]{
     //Toma un pedido dejado por los vendedores
     //Cocina y se lo entrega al cliente
+    while(true){
+        receive cocina(idCliente, pedidoCliente);
+        plato = cocinarPlato(pedidoCliente);
+        send entregaCliente[idCliente](plato)
+    }
 }
 
 ```
@@ -257,8 +282,8 @@ process Cliente [id: 0..N-1]{
     receive asignacionCabina[id](nroCabina); //Espera a que el empleado le asigne una cabina
     usarCabina(nroCabina)
 
-    send prioridadFin(id, pago)
-    receive factura[id](factura)
+    send prioridadFin(id, pago, nroCabina) //Envía el número de cabina que se le indicó 
+    receive factura[id](factura) //Recibe la factura
     salir()
 
 }
@@ -270,8 +295,8 @@ process Empleado{
     while (true){
         //No determinístico
         if not empty(prioridadFin){
-            cabina[10] = False
-            receive prioridadFin(idCliente, pago)
+            receive prioridadFin(idCliente, pago, nroCabina)
+            cabina[nroCabina] = false
             cobrar(pago)
             factura = generarFactura(pago);
             send factura[idCliente](factura)
