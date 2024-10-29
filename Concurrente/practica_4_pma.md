@@ -313,3 +313,93 @@ process Empleado{
 }
 
 ```
+
+--- 
+# Pasaje de mensajes sincrónicos 
+
+## Explicación práctica 
+- Los programas se componen sólo de procesos. 
+- Los canales son de tipo link. 
+- Envío (!): La operación es bloqueante y sincrónica. 
+- Recepción (?): la operación es bloqueante y sincrónica. 
+- Uso de comunicación guardada (If y Do). Solo RECEPCIONES. 
+- El do "guardado" funciona de la misma manera que el IF con la única diferencia que en lugar de hacaerlo una vez que repite el mecanismo hasta que todas las guardas fallan. 
+
+### Ejercicio 1 
+En una empresa de software hay un empleado _Testeo_ que prueba un nuevo producto para encontrar errores, cuand oenceuntra uno generan un reporte para que otro empleado _Mantenimiento_ corrija el error y le responde. El empleado Mantenimiento toma los reportes para evaluarlos, hacer las correcciones necesarias y responderle al empleado _Testeo_.
+
+```c
+
+process Testeo{
+    text reporte;
+    while (true){
+        reporte = generarReporte();
+        !Mantenimiento(reporte) //Envia el mensaje
+        ?Testeo(correcciones)
+    }
+}
+
+
+process Mantenimiento{
+    while(true){
+        ?Testeo(reporte) //Se queda esperando a que haya un reporte
+        correcciones = evaluarReporte(reporte)
+        !Testeo(correcciones)
+    }
+}
+```
+
+### Ejercicio 2 
+En una empresa de sfotware hay un empleado Testeo que prueba un nuevo producto para encontrar errores, cuando encuentra uno generan un reporte para que otro empleado Mantenimiento corrija el error (no requiere una respuesta para seguir trabajando) y continúa trabajando. El empleado Mantenimiento toma los reportes para evaluarlos y hacer las correcciones necesarias. 
+
+```c
+process Testeo{
+    text reporte;
+    while(true){    
+        reporte = generarReporte();
+        !Buffer(reporte)
+    }
+}
+
+process Buffer{
+    cola buffer(text);
+    do Testeo?Buffer(reporte) -> push(reportes, reporte)
+    - not(empty(buffer)) Mantenimiento?Buffer(msj) -> !Mantenimiento(pop(buffer))
+}
+
+process Mantenimiento{
+    text reporteRecibido, solucion
+    while(true){
+        !Buffer("ok")
+        ?Buffer(reporteRecibido)
+        solucion = corregirReporte(reporteRecibido)
+    }
+}
+```
+
+### Ejercicio 3 
+En una empresa de software hay N empleados Testeo que prueban un nuevo producto para encontrar errores, cuando encuentra uno generan un reporte para que otro empleado Mantenimiento corrija el error y le responda. El empleado Mantenimiento toma los reportes para evaluarlos de acuerdo al orden de llegada, hace las correcciones necesarias y le responde al empleado Testeo correspondiente(el que hizo el reporte). 
+
+```c
+process Testeo[id: 0..N-1]{
+    text reporte, resp;
+    while(true){
+        reporte = generarReporte();
+        !Mantenimiento(id, reporte)
+        ?Mantenimiento[id](resp)
+    }
+}
+
+process Buffer{
+
+}
+
+process Mantenimiento{
+    text respuesta;
+    while(true){
+        ?Testeo[*](id, reporte)
+        respuesta = generarSolución(reporte)
+        !Testeo[id](respuesta)
+    }
+}
+```
