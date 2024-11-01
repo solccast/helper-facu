@@ -1,4 +1,4 @@
-# Pasaje de mensajes asincrónicas 
+# Pasaje de mensajes asincrónicos 
 - Los canales son compartidos por todos los procesos.
 - Cada canal es una cola de mensajes; por lo tanto, el primer mensaje encolado es el primero en ser atendido. 
 - El `send` no bloquea al emisor. 
@@ -385,21 +385,197 @@ process Testeo[id: 0..N-1]{
     text reporte, resp;
     while(true){
         reporte = generarReporte();
-        !Mantenimiento(id, reporte)
-        ?Mantenimiento[id](resp)
+        Administrador!reporte(id, reporte)
+        Mantenimiento?respuesta[id](resp)
     }
 }
 
-process Buffer{
-
+process Administrador{
+    do Testeo[*]?reporte(idTest, reporte) -> push (Fila, (idTest, reporte)) //Si hay un mensaje lo pushea
+    - not empty(Fila); Mantenimiento?pedido() ->  pop(Fila(idTest, reporte)); Mantenimiento!reporte(idTest, R)
 }
 
 process Mantenimiento{
     text respuesta;
     while(true){
-        ?Testeo[*](id, reporte)
+        Administrador!pedido() //Avisa al admin que está disponible
+        Administrador?reporte(idTest, reporte) //Espera a que el admin le entregue una tarea
         respuesta = generarSolución(reporte)
-        !Testeo[id](respuesta)
+        Testeo[idTest]!respuesta(respuesta)
+    }
+}
+```
+
+### Ejercicio 4 
+En una empresa de software hay N empleados Testeo que pruban un nuevo producto para encontrar errores, cuando encuentra uno generan un reporte para que uno de los 3 empleados Mantenimiento corrija el error y le responda. Los empleados Mantenimiento toma los reportes para evaluarlos de acuerdo al orden de llegada, hace las correcciones necesarias y le responde al empleado Testeo correspondiente (el que hizo el reporte)
+
+```c
+
+process Testeo[id: 0..N-1]{
+    while(true){
+        reporte = generarReporte();
+        Administrador!reporte(id, reporte)
+        Administrador?aviso(idMantenimiento)
+        Mantenimiento[idMantenimiento]?respuesta(resp)
+    }
+}
+
+process Administrador{
+    do Testeo[*]?reporte(idTesteo, rep) -> push(fila, (idTesteo, rep))
+    - not empty(file) -> {
+        Mantenimiento[*]?disponible(idDisponible); 
+        idTesteo, rep = pop(file, (idTesteo, rep))
+        Testeo[idTesteo]!aviso(idDisponible)
+        Mantenimiento[idDisponible]!reporte(idTesteo, rep)
+    }
+}
+
+process Mantenimiento[id: 0..2]{
+    while(true){
+        Administrador!aviso(id)
+        Administrador?reporte(idTesteo, rep)
+        respuesta = analizarReporte(rep)
+        Testeo[idTesteo]!respuesta(respuesta)
+    }
+}
+
+```
+
+
+> **A tener en cuenta del enunciado**
+    - _Cuando encuentran un bug generan un reporte para que otro empleado Mantenimiento corrija el error (no requiere una respuesta para seguir trabajando) y continúa trabajando_: generar un tercer proceso **BUFFER**.
+    - _Cuando encuentran uno generan un reporte para que otro empleado Mantenimiento corrija el error y le responda. El empleado Mantenimiento toma los reportes para evaluarlos de acuerdo al orden de llegada_: generar un tercer proceso **ADMINISTRADOR**. 
+    En ambos casos utilizar el do no determinístico. 
+
+    
+---
+## Práctica 4 - Segunda parte: PMS 
+
+### Ejercicio 2 
+En un laboratorio de genética veterinaria hay 3 empleados. El primero de ellos continuamente prepara las muestras de ADN; cada vez que termina, se la envía al segundo empleado y vuelve a su trabajo. El segundo empleado toma cada muestra de ADN prepara, arma el set de análisis que se deben realizar con ella y espera el resultado para archivarlo. Por último, el tercer empleado se encarga de realizar el análisis y devolverle el resultado al segundo empleado.
+
+```c
+
+process empleado1{
+    while(true){
+        muestra = prepararMuestraADN()
+        Buffer!envio(muestra)
+    }
+}
+
+
+process Buffer{
+    cola muestras;
+
+    do Buffer?envio(muestra) -> push(muestras, muestra)
+    - not empty(muestras); Empleado2?disponible() -> empleado2!envio(pop(muestra))
+}
+
+process empleado2{ 
+    while(true){
+        Buffer!disponible() //Informa al buffer que está disponible
+        Buffer?envio(muestra) //Recibe la muestra 
+        empleado3!envio(muestra) //Envia la muestra al empleaado 3
+        empleado3?respuesta(muestra_preparada) //Espera la respuesta del empleado 3
+        resultado = analisis(muestra_preparada)
+        archivar(resultado)
+    }
+}
+
+
+process empleado3{
+    while(true){
+        empleado2?envio(muestra)
+        resultado = armarPreparado(muestra)
+        empleado2!respuesta(resultado)
+    }
+}
+
+```
+
+### Ejercicio 4
+En una exposición aeronáutica hay un simulador de vuelo (que debe ser usado con exclusión mutua) y un empleado encargado de administrar su uso. Hay P personas que esperan a que el empleado lo deje acceder al simulador, lo usa por un rato y se retira. 
+**A. Implemente una solución donde el empleado sólo se ocupa de garantizar la exclusión mutua**
+```c
+process Persona[id: 0..P-1]{
+    Empleado!avisoLlegada(id)
+    Empleado?habilitado()
+    accederAlSimulador()
+    usarSimulador()
+    Empleado?avisoLibre()
+    retirarse()
+}
+
+process Empleado{
+    bool libre = true
+    while (true){
+        Persona[*]?avisoLlegada(id)
+        Persona[id]!habilitado()
+        Persona[id]?avisoLibre()
+    }
+}
+
+```
+
+**B. Modifique la solución anterior para que el empleado considere el orden de llegada para dar acceso al simulador.**
+```c
+process Persona[id: 0..P-1]{
+    Empleado!avisoLlegada(id)
+    Empleado?habilitado()
+    accederAlSimulador()
+    usarSimulador()
+    Empleado?avisoLibre()
+    retirarse()
+}
+
+process Empleado{
+    bool libre = true
+    Fila fila;
+    do Persona[*]?avisoLlegada(id) -> {
+        if libre {
+            libre = false
+            Persona[id]!habilitado()
+        } else push(fila, id)
+    } 
+    - not libre; Persona[*]?avisoLibre() ->{
+        if (empty(fila)) libre = true; 
+        else {
+            Persona[pop(fila, id)]!habilitado()
+        }
+    }
+    
+}
+```
+
+### Ejercicio 5
+En un estadio de fútbol hay una máquina expendedora de gaseosas que debe ser usada por E espectadores de acuerdo con el orden de llegada. Cuando el espectador accede a la máquina en su turno usa la máquina y luego se retira para dejar al siguiente. Cada expectador usa una sóla vez la máquina.
+```c
+
+process Espectador[id: 0..E-1]{
+    Administrador!avisoLlegada(id)
+    Administrador?avisoHabilitado()
+    usarMaquina()
+    Administrador!avisoRetiro()
+    retirarse()
+}
+
+
+process Administrador{
+    cola colaMáquina;
+    bool ocupado = false
+    do Administrador[*]?avisoLlegada(idE) -> {
+        if not ocupado{
+            push(colaMáquina(idE))
+        }
+        else {
+            ocupado = true;
+            Espectador[idE]!avisoHabilitado()
+        }
+    }
+    - ocupado; Espectador[*]?avisoRetiro() ->{
+        if empty(colaMáquina) ocupado = false
+        else 
+            Espectador[pop(colaMáquina(idE))]!avisoHabilitado()
     }
 }
 ```
