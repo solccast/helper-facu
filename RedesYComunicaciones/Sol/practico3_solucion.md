@@ -183,6 +183,7 @@ El protocolo DNS utiliza códigos de respuesta (conocidos como Rcodes) para indi
 `host` proporciona información sobre nombres de dominio y direcciones IP.  
 
 ### 13. ¿Qué función cumple en Linux/Unix el archivo `/etc/hosts` o en Windows el archivo `\WINDOWS\system32\drivers\etc\hosts`?
+-> Mapear nombres de dominio a direcciones IP de manera local. Actúa como una pequeña base de datos para la resolución de nombres antes de que el sistema recurra a servidores DNS. 
 Se utiliza para la resolución de nombres de dominio. Su función principal es mapear nombres de host a direcciones IP sin necesidad de consultar un servidor DNS. 
 En ese archivo puede definir manualmente direcciones IP y asociarlas con nombres de dominio específicos. 
 

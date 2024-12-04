@@ -1,6 +1,6 @@
 # Direccionamiento - Capa de red
 ## Apuntes 
-Máscara .> indicará la cantidad de host que podrá aguantar el host. 
+Máscara -> indicará la cantidad de host que podrá aguantar el host. 
 (2^32-mask - 2) -> se descarta loas masscaras 31 y 32 (no se usan). Se resta -2 por la dirección del broadcast.
 Entonces para la cantidad que requiere la red, tenemos que elegir la mascara que sobre pero con el que sea suficiente - mínimo posible. 
 La máscara va aindicar la parte de la dirección ip que quedará inmovilizado. 
