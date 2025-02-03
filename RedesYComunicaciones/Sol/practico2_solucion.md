@@ -127,8 +127,8 @@ En el caso de que se quite la redirección mostrará el cuerpo de la respuesta (
 No es necesaria en el segundo comando porque el `-I` (o `--head`) hace que curl solicite sólo las cabeceras de la respuesta y no el cuerpo, entonces no es necesario descartar nada. 
 
 #### c. ¿Cuántas cabeceras viajaron en el requerimiento? ¿Y en la respuesta? 
-En el requerimiento viajaron 4 cabeceras (incluyendo GET /HTTP/1.1)
-En el caso de la respuesta hay 8 cabeceras (incluyendo HTTP/1.1 200 OK)
+En el requerimiento viajaron 3 cabeceras (la linea de solicitud no cuenta como cabecera)
+En el caso de la respuesta hay 7 cabeceras (la línea de respuesta no cuenta como cabecera)
 
 ### 10. ¿Qué indica la cabecera Date? 
 La cabecera Date indica la fecha y hora en la que el servidor envió la respuesta. Será util esta información para el caching (compara esta fecha con otras cabeceras como `last-modified`)
@@ -241,7 +241,8 @@ Para los **procotolos binarios** los mensajes están codificados en formato bina
 #### a. ¿Qué función cumple la cabecera Host en HTTP 1.1? ¿Existía en HTTP 1.0? ¿Qué sucede en HTTP/2? (Ayuda: https://undertow.io/blog/2015/04/27/An-in-depth-overview-of-HTTP2.html para HTTP/2)
 La cabecera `Host` se utiliza para especificar el nombre del dominio del servidor al que se le está realizando la solicitud. Un solo servidor puede alojar múltiples dominios (_hosting virtual_) entonces la cabecera le permite al servidor indentificar cuál de los sitios debe gestionar la solicitud. 
 
-En HTTP/1.0 no existía la cabecera `Host`.
+En HTTP/1.0 el header `Host` no es obligatoria pero puede ser necesaria dependiendo de cómo el servidor web esté configurado. Si el header no estaba presente en la solicitud HTTP 1.0  el servidor asumiría que la solicitud estaba destinada al dominio asociado con la dirección IP del srevidor.
+En el caso de HTTP/1.1 el header es obligatorio, en caso de estar ausente el servidor responderá con un error 400. Es importante dado que muchos servidores web pueden alojar múltiples sitios web en una sola dirección IP. 
 
 En el caso de HTTP/2 el tag sigue presente pero es reemplazada por `:authority` que proporciona el valor del host y puerto del servidor al que se dirige la solicitud.  
 
@@ -319,7 +320,7 @@ Revisar `content-length` (No es necesario, porque es un método HEAD, no un GET)
 ### b. ¿Qué método está utilizando? Dicho método, ¿retorna el recurso completo solicitado? 
 Está usando el método `HEAD` que NO retorna el recurso solicitado, unicamente los encabezados. 
 ### c. ¿Cuál es el recurso solicitado? 
-Es el recurso /metodos  de tipo text/html 
+Es el recurso /metodos 
 ### d. ¿El método funcionó correctamente? 
 Sí, por el codigo de estado 200.
 ### e. Si la solicitud hubiera llevado un encabezado que diga:
@@ -329,7 +330,7 @@ If-Modified-Since: Sat, 20 Jan 2018 13:02:41 GMT
 ¿Cuál habría sido la respuesta del servidor web? ¿Qué habría hecho el navegador en este caso? 
 
 ---
-Entonces, al ser un método HEAD pedirá los encabezados, lo que va a importar será el codigo de estado. En caso de haya sido un GET ele navegador podría pedir el recurso en su caché. 
+Entonces, al ser un método HEAD pedirá los encabezados, lo que va a importar será el codigo de estado. En caso de haya sido un GET el navegador podría pedir el recurso en su caché. 
 Si no fue modificado desde esa fecha se recibe el código 304, caso contrario se recibe un 200 con el cuerpo del mensaje (si es un GET)
 
 ---
