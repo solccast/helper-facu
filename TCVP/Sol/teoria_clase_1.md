@@ -17,7 +17,50 @@
 
 ## Máquina de Turing
 
+El funcionamiento de una máquina de Turing se basa en los siguientes componentes:
+- Una **unidad de control** que posee un conjunto finito de estados. Entre estos estados se incluyen un estado inicial (q0), un estado de aceptación (qA) y un estado de rechazo (qR).
+- Una **función de transición (δ)** que especifica el algoritmo que la máquina ejecuta. Esta función determina el siguiente estado de la unidad de control, el símbolo que se escribe en la cinta y el movimiento del cabezal, basándose en el estado actual y el símbolo leído.
+- Una **cinta infinita en ambos extremos**, dividida en celdas, donde se pueden escribir símbolos.
+- Un **cabezal** que puede leer y escribir símbolos en la cinta y moverse una celda a la izquierda (L), a la derecha (R) o permanecer en el mismo lugar (S).
 
+En cada momento de la ejecución, la máquina se encuentra en una configuración determinada por su estado actual, el contenido de la cinta y la posición del cabezal.
+En cada paso, la máquina:
+1. Lee el símbolo al que apunta el cabezal en la cinta.
+2. Consulta su estado actual y el símbolo leído en la función de transición (δ).
+3. Basándose en la definición de δ para esa combinación (estado actual, símbolo leído), la máquina realiza las siguientes acciones:
+    - Cambia a un nuevo estado.
+    - Escribe un nuevo símbolo (o el mismo) en la celda actual de la cinta.
+    - Mueve el cabezal a la izquierda, a la derecha o lo deja en la misma posición.
+La ejecución continúa hasta que la máquina alcanza un estado de aceptación (qA) o un estado de rechazo (qR), en cuyo caso la máquina se detiene.
+
+> [!NOTE]
+> Es importante destacar la Tesis de Church-Turing, que postula que cualquier dispositivo computacional físicamente realizable puede ser simulado por una máquina de Turing. Esto subraya la universalidad del modelo de la máquina de Turing como un concepto fundamental en la computación.
+
+### Perspectivas
+- Como calculadoras: a partir de una entrada producen una salida, resolviendo problemas de búsqueda. 
+- Como reconocedoras: aceptan o rechazan entradas, resolviendo problemas de decisión ->  la máquina reconoce un lenguaje formado por el conjunto de todas las cadenas que acepta (las instancias que tienen solución). 
+- Como generadoras: se escriben todas las cadenas acorrespondientes a las instancias positivas de un problema en una cinta de salida. 
+
+
+### MT de varias cintas
+Posee variascintas, cada una con su propio cabezal de escritura/lectura independiente. La unidad de control sigue siendo única. 
+
+#### Funcionamiento
+El funcionamiento de una MT con varias cintas es el siguiente:
+1. En un solo paso, la máquina lee el estado corriente de la unidad de control y el símbolo corriente al que apunta cada uno de los K cabezales en sus respectivas cintas.
+2. Basándose en esta información, la función de transición (δ) determina:
+    - El nuevo estado de la unidad de control.
+    - El símbolo que se escribirá en la celda actual de cada una de las K cintas.
+    - El movimiento independiente (izquierda, derecha o ninguno) de cada uno de los K cabezales.
+Una configuración de una MT con varias cintas está definida por el estado actual, el contenido de todas las cintas y la posición de cada uno de los cabezales.
+
+> Teorema: cualquier MT con K > 1 cintas puede ser simulada por una MT con una sola cinta: Las pistas impares almacenan el contenido de las cintas originales, y las pistas pares almacenan la posición del cabezal correspondiente mediante una marca. Sin embargo, esta simulación introduce un retardo en el tiempo de ejecución. El texto indica que simular h pasos de una MT con K cintas puede requerir un tiempo del orden de O(h²) en una MT con una sola cinta.
+
+### Modelos equivalentes de MT 
+**Equivalencia de dos MTs:** dos máquinas se consideran equivalentes si aceptan el mismo lenguaje. Se centra en el lenguaje específico que cada máquina reconoce o decide, sin importar los detalles internos de su funcionamiento, como el número de estados o la función de transición específica.  _Por ejemplo, dos MTs con diferentes conjuntos de estados y funciones de transición podrían ser equivalentes si ambas reconocen el lenguaje_
+**Equivalencia de dos modelos de MTs:** indica que dada una MT de un modelo, existe una MT equivalente del otro modelo. Cualquier problema que pueda ser resuelto por una MT en un modelo también puede ser resuelto por una MT en el otro modelo y viceversa. La prueba de equivalencia entre dos modelos generalmente implica demostrar que una máquina del primer modelo puede simular cualquier máquina del segundo modelo, y viceversa.
+
+![alt text](image-2.png)
 
 ## Computabilidad 
 
@@ -37,14 +80,14 @@
 Entonces, `L(M)` indica el lenguaje que acepta la Máquina de Turing 
 _Ejemplo: `L(M) = {φ1, φ2, φ3, …}` donde φ es una fórmula booleana satisfactible_
 
-> Se utilizarán las palalbras problema y lenguaje de forma indistinta. 
+> Se utilizarán las palabras problema y lenguaje de forma indistinta (temporalmente). 
 
 - **Problemas computables**:
     - **decidibles:** la MT siempre se detiene.  Estos problemas se resuelven totalmente, tanto en casos positivos como negativos. 
     - **no decidibles:** la MT los resuelve parcialmente. No existe una MT que siempre se detenga para estos problemas. 
         - Si la entrada pertenece al lenguaje responde "Sí". 
         - Si la entrada no pertenece al lenguaje, la MT puede responder "no" o "loopear".
-    _Ejemplo: el problema de decidir si un prorgama P para (Halting problem)_
+    _Ejemplo: el problema de decidir si un progama P para (Halting problem)_
 
 - **Problemas no computables:** no tienen MT que los resuelvan (ni siquiera que respondan sí en todos los casos positivos). _Ejemplo: decidir la equivalencia de dos programas P1 y P2_
 
