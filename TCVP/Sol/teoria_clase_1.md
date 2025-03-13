@@ -43,7 +43,7 @@ La ejecución continúa hasta que la máquina alcanza un estado de aceptación (
 
 
 ### MT de varias cintas
-Posee variascintas, cada una con su propio cabezal de escritura/lectura independiente. La unidad de control sigue siendo única. 
+Posee varias cintas, cada una con su propio cabezal de escritura/lectura independiente. La unidad de control sigue siendo única. 
 
 #### Funcionamiento
 El funcionamiento de una MT con varias cintas es el siguiente:
@@ -57,7 +57,8 @@ Una configuración de una MT con varias cintas está definida por el estado actu
 > Teorema: cualquier MT con K > 1 cintas puede ser simulada por una MT con una sola cinta: Las pistas impares almacenan el contenido de las cintas originales, y las pistas pares almacenan la posición del cabezal correspondiente mediante una marca. Sin embargo, esta simulación introduce un retardo en el tiempo de ejecución. El texto indica que simular h pasos de una MT con K cintas puede requerir un tiempo del orden de O(h²) en una MT con una sola cinta.
 
 ### Modelos equivalentes de MT 
-**Equivalencia de dos MTs:** dos máquinas se consideran equivalentes si aceptan el mismo lenguaje. Se centra en el lenguaje específico que cada máquina reconoce o decide, sin importar los detalles internos de su funcionamiento, como el número de estados o la función de transición específica.  _Por ejemplo, dos MTs con diferentes conjuntos de estados y funciones de transición podrían ser equivalentes si ambas reconocen el lenguaje_
+**Equivalencia de dos MTs:** dos máquinas se consideran equivalentes si aceptan el mismo lenguaje. Se centra en el lenguaje específico que cada máquina reconoce o decide, sin importar los detalles internos de su funcionamiento, como el número de estados o la función de transición específica.  _Por ejemplo, dos MTs con diferentes conjuntos de estados y funciones de transición podrían ser equivalentes si ambas reconocen el lenguaje_.
+
 **Equivalencia de dos modelos de MTs:** indica que dada una MT de un modelo, existe una MT equivalente del otro modelo. Cualquier problema que pueda ser resuelto por una MT en un modelo también puede ser resuelto por una MT en el otro modelo y viceversa. La prueba de equivalencia entre dos modelos generalmente implica demostrar que una máquina del primer modelo puede simular cualquier máquina del segundo modelo, y viceversa.
 
 ![alt text](image-2.png)
@@ -97,6 +98,9 @@ _Ejemplo: `L(M) = {φ1, φ2, φ3, …}` donde φ es una fórmula booleana satisf
 ---
 
 # Anexo
+
+![alt text](image-3.png)
+
 ## Repaso conceptos básicos 
 
 - **Alfabeto** -> conjunto finito de símbolos. `Ʃ = {a, b, c}` es un alfabeto de tres símbolos.
