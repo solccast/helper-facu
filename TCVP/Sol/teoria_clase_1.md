@@ -37,9 +37,10 @@ La ejecución continúa hasta que la máquina alcanza un estado de aceptación (
 > Es importante destacar la Tesis de Church-Turing, que postula que cualquier dispositivo computacional físicamente realizable puede ser simulado por una máquina de Turing. Esto subraya la universalidad del modelo de la máquina de Turing como un concepto fundamental en la computación.
 
 ### Perspectivas
-- Como calculadoras: a partir de una entrada producen una salida, resolviendo problemas de búsqueda. 
-- Como reconocedoras: aceptan o rechazan entradas, resolviendo problemas de decisión ->  la máquina reconoce un lenguaje formado por el conjunto de todas las cadenas que acepta (las instancias que tienen solución). 
-- Como generadoras: se escriben todas las cadenas acorrespondientes a las instancias positivas de un problema en una cinta de salida. 
+- Como **calculadoras**: a partir de una entrada producen una salida, resolviendo problemas de búsqueda. 
+- Como **reconocedoras**: aceptan o rechazan entradas, resolviendo problemas de decisión ->  la máquina reconoce un lenguaje formado por el conjunto de todas las cadenas que acepta (las instancias que tienen solución).
+-> A mi me sirve pensarlo como que estas máquinas se centran en **reconocer un lenguaje**. 
+- Como **generadoras**: se escriben todas las cadenas acorrespondientes a las instancias positivas de un problema en una cinta de salida. El problema de enumeración requiere identificar y presentar todas las soluciones posibles para una instancia dada del problema de satisfactibilidad.
 
 
 ### MT de varias cintas
@@ -60,6 +61,9 @@ Una configuración de una MT con varias cintas está definida por el estado actu
 **Equivalencia de dos MTs:** dos máquinas se consideran equivalentes si aceptan el mismo lenguaje. Se centra en el lenguaje específico que cada máquina reconoce o decide, sin importar los detalles internos de su funcionamiento, como el número de estados o la función de transición específica.  _Por ejemplo, dos MTs con diferentes conjuntos de estados y funciones de transición podrían ser equivalentes si ambas reconocen el lenguaje_.
 
 **Equivalencia de dos modelos de MTs:** indica que dada una MT de un modelo, existe una MT equivalente del otro modelo. Cualquier problema que pueda ser resuelto por una MT en un modelo también puede ser resuelto por una MT en el otro modelo y viceversa. La prueba de equivalencia entre dos modelos generalmente implica demostrar que una máquina del primer modelo puede simular cualquier máquina del segundo modelo, y viceversa.
+
+> Dos modelos de MT son equivalentes si cualquier función computable por un modelo también puede ser computada por el otro, aunque con una diferencia en la eficiencia (tiempo de ejecución o espacio usado).
+
 
 ![alt text](image-2.png)
 
