@@ -21,7 +21,7 @@
 - (d) $L^C$ pertenece al conjunto CO-RE pero no necesariamente a R.
 5. Si un lenguaje $L$ pertenece tanto a RE como a CO-RE, entonces:
 - (a) $L$ es necesariamente no recursivo.
-- (b) $L$ es necesariamente recursivo. [véase la conversación anterior, 50, 194]
+- (b) $L$ es necesariamente recursivo. 
 - (c) $L$ no puede existir.
 - (d) No se puede determinar si $L$ es recursivo o no.
 6. ¿Cuál de las siguientes afirmaciones sobre la clausura de los conjuntos de lenguajes es verdadera?
@@ -32,5 +32,5 @@
 7. El conjunto CO-RE contiene todos los lenguajes cuyos:
 - (a) Elementos pueden ser contados por una Máquina de Turing.
 - (b) Complementos son recursivos.
-- (c) Complementos son recursivamente enumerables. [véase la conversación anterior]
+- (c) Complementos son recursivamente enumerables. 
 - (d) Son decididos por una Máquina de Turing no determinística.
