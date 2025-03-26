@@ -1,3 +1,9 @@
+# TCVP - TP 1: La máquina de Turing y la jerarquía de la computabilidad 
+
+|Alumno| Legajo|
+|:--:|:--:|
+|Chilaca Castro, Sol Angela|22277/2|
+
 ## Ejercicio 1
 
 1. 
