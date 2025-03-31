@@ -1,0 +1,2 @@
+Multiplicacion de matrices resultado correcto
+Tiempo total=16.346772, Tiempo comunicacion=0.467014, Tiempo computo=15.879758
