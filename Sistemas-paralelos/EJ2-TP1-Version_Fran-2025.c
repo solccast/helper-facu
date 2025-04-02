@@ -88,10 +88,9 @@ int main(int argc, char *argv[]){
     promedioB=promedioB/cantElementos;
     
     maxA = minA = A[0];
-    for(j=0;j<N;j++){
-    		offJ = j*N;
-        for(i=0;i<N;i++){
-            int valor=A[offJ+i];
+    for(i=0;i<N;i++){
+        for(j=0;j<N;j++){
+            int valor=A[j*N+i];
             //buscamos max de A
             if(valor > maxA)
             		maxA=valor;
@@ -144,8 +143,9 @@ int main(int argc, char *argv[]){
 
     // 5) BA * RP + BCT = R
     for (i = 0; i < N; i++) {
+        offI = i*N;
         for (j = 0; j < N; j++) {
-            R[i*N+j] = BA[i*N+j] * RP + BCT[i*N+j];
+            R[j*N+i] = BA[offI+j] * RP + BCT[offI+j];
         }
     }
 
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]){
     //Verifica el resultado
 		for(i=0;i<N;i++){
 			for(j=0;j<N;j++){
-				check=check&&(R[i*N+j]==N);
+				check=check&&(R[j*N+i]==N);
 		 	}
 		}
 
