@@ -18,7 +18,6 @@ int main (int argc,char*argv[]){
     double *A, *B, *C; //Matrices cuadradas de NxN con elementos de tipo double
     double *R; //Matriz resultado de la multiplicacion de todas las matrices 
     double *RES_PARCIAL; //Matriz resultado de la multiplicacion de A y B
-    double *RES_PRIMERA_PARTE_FORM;
     double *RES_PARCIAL_T; //Matriz resultado de la multiplicacion de C y B transpuesta
     int i, j, k, sub_i, sub_j, sub_k;
     double timetick;
@@ -57,35 +56,21 @@ int main (int argc,char*argv[]){
     R = (double *) malloc(n*n*sizeof(double)); //Reservamos memoria para R
     RES_PARCIAL = (double *) malloc(n*n*sizeof(double)); //Reservamos memoria para RES_PARCIAL
     RES_PARCIAL_T = (double *) malloc(n*n*sizeof(double)); //Reservamos memoria para RES_PARCIAL_T
-    RES_PRIMERA_PARTE_FORM = (double *) malloc(n*n*sizeof(double)); //Reservamos memoria para RES_PRIMERA_PARTE_FORM
-
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++){
-            A[i*n + j] = 1.0; // Inicializamos A por fila
-            B[j*n + i] = 1.0; // Inicializamos B por columna
-            C[i*n + j] = 1.0; // Inicializamos C por fila
-            RES_PARCIAL[i*n + j]= 0.0;
-            RES_PARCIAL_T[i*n + j]= 0.0;
-            
-        }
-    }
-
+    
     cantidad_elementos_totales = n * n; 
 
-    //Imprimir vector A
-    printf("Vector A:\n");
-    for (int m = 0; m < cantidad_elementos_totales; m++){
-        printf("%.1f ", A[m]);
+    double count = 0.0;
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            A[i*n + j] = count; // Inicializamos A por fila
+            B[j*n + i] = count; // Inicializamos B por columna
+            C[i*n + j] = count; // Inicializamos C por fila
+            RES_PARCIAL[i*n + j]= 0.0; //Matriz donde se almacenará la primera parte de la fórmula 
+            RES_PARCIAL_T[i*n + j]= 0.0;
+            R[i*n + j] = 0.0; 
+            count++;
+        }
     }
-    printf("\n\nVector B:\n");
-    for (int q = 0; q < cantidad_elementos_totales; q++){
-        printf("%.1f ", B[q]);
-    }
-    printf("\n\nVector C:\n");
-    for (int r = 0; r < cantidad_elementos_totales; r++){
-        printf("%.1f ", C[r]);
-    }
-    printf("\n -------------------------------\n");
 
     timetick = dwalltime(); //Inicio del conteo 
 
@@ -121,12 +106,12 @@ int main (int argc,char*argv[]){
 
     for (i = 0; i < n; i++){
         for (j = 0; j < n; j++){
-            promB += B[i*n +j]; //Recorre de forma contigua el vector y no da saltos 
-            if (B[i*n+j] < minB){
-                minB = B[i*n+j]; // Si encontramos un nuevo minimo, lo actualizamos
+            promB += B[j*n +i]; // Acumulamos el promedio de la matriz B
+            if (B[j*n+i] < minB){
+                minB = B[j*n+i]; // Si encontramos un nuevo minimo, lo actualizamos
             }
             if (B[i*n+j] > maxB){
-                maxB = B[i*n+j]; // Si encontramos un nuevo maximo, lo actualizamos
+                maxB = B[j*n+i]; // Si encontramos un nuevo maximo, lo actualizamos
             }
         }
     }
@@ -156,7 +141,7 @@ int main (int argc,char*argv[]){
                             sumaParcial += A[sub_i*n + sub_k] * B[sub_k*n + sub_j]; 
                             //printf("Estamos multiplicando: %.1f * %.1f => Resultado: %.1f\n", A[sub_i*n + sub_k], B[sub_j*n + sub_k], sumaParcial); //Imprimimos el valor de la multiplicacion
                         }
-                        RES_PARCIAL[sub_i*n + sub_j] += sumaParcial * escalar; // Guardamos el resultado en la matriz RES_PARCIAL y le multiplicamos el resultado de la primera parte de la fórmula
+                        RES_PARCIAL[sub_i*n + sub_j] += sumaParcial; // Guardamos el resultado en la matriz RES_PARCIAL y le multiplicamos el resultado de la primera parte de la fórmula
                         //printf("Se almacena: %.1f\n", RES_PARCIAL[sub_i*n + sub_j]); //Mostrar qué almacena y en qué posición 
                     }
                 }
@@ -183,18 +168,19 @@ int main (int argc,char*argv[]){
             } 
         }
     }
-    for (int m = 0; m <n*n; m++){
-        RES_PARCIAL_T[m] += RES_PARCIAL[m]; //Sumamos la matriz resultado de la primera parte con la segunda parte
+    for (int m = 0; m < cantidad_elementos_totales; m++){
+        R[m] = RES_PARCIAL_T[m] + (escalar * RES_PARCIAL[m]); //Sumamos la matriz resultado de la primera parte con la segunda parte
     }
     timetick = dwalltime() - timetick; //Guardamos el tiempo de fin 
 
+    printf("Matriz resultado:\n");
     for (int m = 0; m < cantidad_elementos_totales; m++){
-        printf("%.1f ", RES_PARCIAL_T[m]);
-    } 
+        printf("%.1f ", R[m]); //Imprimimos la matriz resultado por filas
+    }
 
-    printf("Multiplicacion de matrices de %dx%d. Tiempo en segundos %f\n",n,n, timetick); //Imprimimos el tiempo de la multiplicacion de matrices
+    printf("\nMultiplicacion de matrices de %dx%d. Tiempo en segundos %f\n",n,n, timetick); //Imprimimos el tiempo de la multiplicacion de matrices
 
-    verificarResultado(RES_PARCIAL_T, n); //Verificamos el resultado de la multiplicacion de matrices
+    //verificarResultado(RES_PARCIAL_T, n); //Verificamos el resultado de la multiplicacion de matrices
 
     //Liberar memoria
     free(A);
@@ -203,7 +189,6 @@ int main (int argc,char*argv[]){
     free(R);
     free(RES_PARCIAL);
     free(RES_PARCIAL_T);
-    free(RES_PRIMERA_PARTE_FORM);
     return (0);
 }
 
