@@ -16,16 +16,17 @@ void verificarResultado(double *M, int N);
 int main (int argc,char*argv[]){
 
     double *A, *B, *C; //Matrices cuadradas de NxN con elementos de tipo double
-    double *R; //Matriz resultado de la multiplicacion de todas las matrices 
+    double *R; //Matriz resultado 
     double *RES_PARCIAL; //Matriz resultado de la multiplicacion de A y B
     double *RES_PARCIAL_T; //Matriz resultado de la multiplicacion de C y B transpuesta
-    int i, j, k, sub_i, sub_j, sub_k;
+    int i, j, k, sub_i, sub_j, sub_k; //Índices auxiliares que nos ayudarán a recorrer las matrices 
     double timetick;
     double minA, minB, maxA, maxB, promA, promB;  
     double den, num;
     double escalar = 0.0; 
     double valorActual; 
     int cantidad_elementos_totales;
+    int desplazamiento;
 
 
     if (argc < 3) {
@@ -85,18 +86,19 @@ int main (int argc,char*argv[]){
 
     for (i = 0; i < n; i++){
         for (j = 0; j < n; j++){
-            promA += A[i*n+j]; 
-            if (A[i*n + j] < minA){
-                minA = A[i*n + j]; // Si encontramos un nuevo minimo, lo actualizamos
+            valorActual = A[i*n+j]; 
+            promA += valorActual; 
+            if (valorActual < minA){
+                minA = valorActual; // Si encontramos un nuevo minimo, lo actualizamos
             }
-            if (A[i*n + j] > maxA){
-                maxA = A[i*n + j]; // Si encontramos un nuevo maximo, lo actualizamos
+            if (valorActual > maxA){
+                maxA = valorActual; // Si encontramos un nuevo maximo, lo actualizamos
             }
         }
     }
 
     // Calculo del promedio final de la matriz A
-    promA = promA / (n * n); 
+    promA = promA / cantidad_elementos_totales; 
 
 
     // Recorrido de la matriz B
@@ -106,23 +108,23 @@ int main (int argc,char*argv[]){
 
     for (i = 0; i < n; i++){
         for (j = 0; j < n; j++){
-            promB += B[j*n +i]; // Acumulamos el promedio de la matriz B
-            if (B[j*n+i] < minB){
-                minB = B[j*n+i]; // Si encontramos un nuevo minimo, lo actualizamos
+            valorActual = B[j*n+i];
+            promB += valorActual; // Acumulamos el promedio de la matriz B
+            if (valorActual < minB){
+                minB = valorActual; // Si encontramos un nuevo minimo, lo actualizamos
             }
-            if (B[i*n+j] > maxB){
-                maxB = B[j*n+i]; // Si encontramos un nuevo maximo, lo actualizamos
+            if (valorActual > maxB){
+                maxB = valorActual; // Si encontramos un nuevo maximo, lo actualizamos
             }
         }
     }
 
-    promB = promB / (n * n); // Calculo del promedio final de la matriz B
+    promB = promB / cantidad_elementos_totales; // Calculo del promedio final de la matriz B
 
     // Obtenemos el escalar parcial
     num = (maxA * maxB) - (minA * minB);
     den = promA * promB; 
     escalar = num / den; //Calculamos el escalar 
-
     
     printf("\nmaxA: %.2f, maxB: %.2f, minA: %.2f, minB: %.2f\n", maxA, maxB, minA, minB);
     printf("promA: %.2f, promB: %.2f\n", promA, promB); //Imprimimos los valores de maximo, minimo y promedio de A y B
@@ -136,13 +138,12 @@ int main (int argc,char*argv[]){
                 //Recorrido submatrices 
                 for (sub_i = i; sub_i < i + tam_bloque; sub_i++){
                     for (sub_j = j; sub_j < j + tam_bloque; sub_j++){
+                        desplazamiento = sub_i*n; //Desplazamiento para recorrer 
                         double sumaParcial = 0.0; // Inicializamos el valor actual en 0.0
                         for (sub_k = k; sub_k < k + tam_bloque; sub_k++){
-                            sumaParcial += A[sub_i*n + sub_k] * B[sub_k*n + sub_j]; 
-                            //printf("Estamos multiplicando: %.1f * %.1f => Resultado: %.1f\n", A[sub_i*n + sub_k], B[sub_j*n + sub_k], sumaParcial); //Imprimimos el valor de la multiplicacion
+                            sumaParcial += A[desplazamiento + sub_k] * B[sub_k*n + sub_j]; 
                         }
-                        RES_PARCIAL[sub_i*n + sub_j] += sumaParcial; // Guardamos el resultado en la matriz RES_PARCIAL y le multiplicamos el resultado de la primera parte de la fórmula
-                        //printf("Se almacena: %.1f\n", RES_PARCIAL[sub_i*n + sub_j]); //Mostrar qué almacena y en qué posición 
+                        RES_PARCIAL[desplazamiento + sub_j] += sumaParcial; // Guardamos el resultado en la matriz RES_PARCIAL 
                     }
                 }
             } 
@@ -156,12 +157,13 @@ int main (int argc,char*argv[]){
                 //Recorrido submatrices 
                 for (sub_i = i; sub_i < i + tam_bloque; sub_i++){
                     for (sub_j = j; sub_j < j + tam_bloque; sub_j++){
+                        desplazamiento = sub_i*n; 
                         double sumaParcial = 0.0; // Inicializamos el valor actual en 0.0
                         for (sub_k = k; sub_k < k + tam_bloque; sub_k++){
-                            sumaParcial += C[sub_i*n + sub_k] * B[sub_j*n + sub_k]; 
+                            sumaParcial += C[desplazamiento + sub_k] * B[sub_j*n + sub_k]; 
                             //printf("Estamos multiplicando: %.1f * %.1f => Resultado: %.1f\n", A[sub_i*n + sub_k], B[sub_j*n + sub_k], sumaParcial); //Imprimimos el valor de la multiplicacion
                         }
-                        RES_PARCIAL_T[sub_i*n + sub_j] += sumaParcial; // Almacenamos el resultado más la suma de la primera parte 
+                        RES_PARCIAL_T[desplazamiento + sub_j] += sumaParcial; // Almacenamos el resultado más la suma de la primera parte 
                         //printf("Se almacena: %.1f\n", sumaParcial); //Mostrar qué almacena y en qué posición 
                     }
                 }
