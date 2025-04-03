@@ -13,7 +13,7 @@ double dwalltime(){
 }
 
 int main(int argc, char *argv[]){
-    double *A,*B,*C,*BCT,*BA,*R; 
+    double *A,*B,*C,*CBT,*AB,*R; 
     double timeTotal,tick,maxA,minA,maxB,minB;
     int i,j,offI,offJ,k,l,N,tam_bloque;
     int ii, jj, kk;
@@ -40,14 +40,14 @@ int main(int argc, char *argv[]){
     B=(double*) malloc(N*N*sizeof(double));
     C=(double*) malloc(N*N*sizeof(double));
     R=(double*) malloc(N*N*sizeof(double));
-    BCT=(double*) malloc(N*N*sizeof(double));
-    BA=(double*) malloc(N*N*sizeof(double));
+    CBT=(double*) malloc(N*N*sizeof(double));
+    AB=(double*) malloc(N*N*sizeof(double));
 
     //Inicializar matrices
     for(i=0;i<N;i++){
         for(j=0;j<N;j++){
-            A[j*N+i]=1.0; //Ordenada por Columnas
-            B[i*N+j]=1.0; //Ordenada por Filas
+            A[i*N+j]=1.0; //Ordenada por Columnas
+            B[j*N+i]=1.0; //Ordenada por Filas
             C[i*N+j]=1.0; //Ordenada Por Filas
         }
     }
@@ -61,10 +61,10 @@ int main(int argc, char *argv[]){
             MinB = mínimo de B
             MaxB = máximo de B
             PromB = promedio de B 
-    2)  B X A = BA
-    3)  B x CT = BCT
+    2)  A X B = AB
+    3)  C x BT = CBT
     4)  (MaxA x MaxB - MinA x MinB) / (PromA x PromB) = RP 
-    5)  BA + BCT = R
+    5)  AB + CBT = R
 
     */
 
@@ -72,25 +72,11 @@ int main(int argc, char *argv[]){
     tick = dwalltime();
     //1) calcula max de A y B , min de A y B y promedio de A y B
     
-    maxB = minB = B[0];
+    maxA = minA = A[0];
     for(i=0;i<N;i++){
     		offI = i*N;
         for(j=0;j<N;j++){
-            int valor=B[offI+j];
-            //buscamos max de A
-            if(valor > maxB)
-            		maxB=valor;
-            if(valor < minB)
-            		minB=valor;
-            promedioB += valor;
-        }
-    }
-    promedioB=promedioB/cantElementos;
-    
-    maxA = minA = A[0];
-    for(i=0;i<N;i++){
-        for(j=0;j<N;j++){
-            int valor=A[j*N+i];
+            int valor=A[offI+j];
             //buscamos max de A
             if(valor > maxA)
             		maxA=valor;
@@ -98,10 +84,24 @@ int main(int argc, char *argv[]){
             		minA=valor;
             promedioA += valor;
         }
-    }    
+    }
     promedioA=promedioA/cantElementos;
+    
+    maxB = minB = A[0];
+    for(i=0;i<N;i++){
+        for(j=0;j<N;j++){
+            int valor=B[j*N+i];
+            //buscamos max de A
+            if(valor > maxB)
+            		maxB=valor;
+            if(valor < minB)
+            		minA=valor;
+            promedioB += valor;
+        }
+    }    
+    promedioB=promedioB/cantElementos;
 
-    // 2) calculo de B X A = BA (ordenado x filas)
+    // 2) calculo de A X B = AB (ordenado x filas)
     for (i = 0; i < N; i += tam_bloque) {
         for (j = 0; j < N; j += tam_bloque) {
             for  (k = 0; k < N; k += tam_bloque) {
@@ -111,16 +111,25 @@ int main(int argc, char *argv[]){
                         offJ=jj*N;
                         double temp = 0.0;
                         for (kk = k; kk < k + tam_bloque; kk++) {
-                            temp += B[offI+kk] * A[offJ+kk];
+                            temp += A[offI+kk] * B[offJ+kk];
                         }
-                        BA[offI+jj] += temp;
+                        AB[offI+jj] += temp;
                     }
                 }
             }
         }
-    } 
+    }
+    
+    // Transpongo B
+    for(i=0; i<N; i++){
+        for(j=i+1; j<N; j++){
+            double temp = B[i*N + j];
+            B[i*N + j] = B[j*N + i];
+            B[j*N + i] = temp;
+        }
+    }
 
-    // 3) B x CT = BCT (ordenado x filas)
+    // 3) C x BT = CBT (ordenado x filas)
     for (i = 0; i < N; i += tam_bloque) {
         for (j = 0; j < N; j += tam_bloque) {
             for  (k = 0; k < N; k += tam_bloque) {
@@ -128,10 +137,11 @@ int main(int argc, char *argv[]){
                     offI=ii*N;
                     for (jj = j; jj < j + tam_bloque; jj++){
                         double temp = 0.0;
+                        offJ=jj*N;
                         for (kk = k; kk < k + tam_bloque; kk++) {
-                            temp += B[offI+kk] * C[kk*N+jj];
+                            temp += C[offI+kk] * B[offJ+kk];
                         }
-                        BCT[offI+jj] += temp;
+                        CBT[offI+jj] += temp;
                     }
                 }
             }
@@ -145,7 +155,7 @@ int main(int argc, char *argv[]){
     for (i = 0; i < N; i++) {
         offI = i*N;
         for (j = 0; j < N; j++) {
-            R[j*N+i] = BA[offI+j] * RP + BCT[offI+j];
+            R[j*N+i] = AB[offI+j] * RP + CBT[offI+j];
         }
     }
 
@@ -173,7 +183,7 @@ int main(int argc, char *argv[]){
     free(B);
     free(C);
     free(R);
-    free(BA);
-    free(BCT);
+    free(AB);
+    free(CBT);
     return 0;
 }
